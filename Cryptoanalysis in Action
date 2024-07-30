@@ -1,0 +1,719 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# SYMMETRIC ENCRYPTION "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The same key is used for encryption and decryption in symmetric encryption. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Monoalphabetic Substitution (Historical) Ciphers "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Caesar Cipher / Shift Cipher"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<img src=\"./9.Images/CC.jpg\" alt=\"Caasar Cipher, how does it work?\"/><br>\n",
+    "Traditional Caesar Cipher key is 3.<br>\n",
+    "This means 'A' becomes 'D' and 'B' becomes 'E'...<br>\n",
+    "Traditional Caesar Cipher uses upper case.<br>\n",
+    "Below you can test the implementation of Caesar Cipher in Python.<br>\n",
+    "Since selecting key 3 is trivial to implement, we let the user to choose the key.<br>\n",
+    "For instance, if the key is selected as 5 then 'A' will be shifted 5 characters and becomes'F'."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Caesar Cipher\n",
+    "def caesar_cipher(text, shift):\n",
+    "    encrypted_text = \"\"\n",
+    "    for char in text:\n",
+    "        if char.isalpha():  # Check if the character is a letter\n",
+    "            if char.islower():\n",
+    "                shifted_char = chr(((ord(char) - ord('a') + shift) % 26) + ord('a'))\n",
+    "            else:\n",
+    "                shifted_char = chr(((ord(char) - ord('A') + shift) % 26) + ord('A'))\n",
+    "        else:\n",
+    "            shifted_char = char\n",
+    "        encrypted_text += shifted_char\n",
+    "    return encrypted_text\n",
+    "\n",
+    "def caesar_decipher(text, shift):\n",
+    "    return caesar_cipher(text, -shift)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Encrypted 'Cryptanalysis in Action Course, EC-Council' is 'Fubswdqdobvlv lq Dfwlrq Frxuvh, HF-Frxqflo'\n"
+     ]
+    }
+   ],
+   "source": [
+    "plaintext = input(f'Input the text to encrypt')\n",
+    "shift = int(input(f'Input the shift'))\n",
+    "encrypted = caesar_cipher(plaintext,shift)\n",
+    "print(\"Encrypted \"+ \"\\'\"+ plaintext +\"\\'\"+ \" is \"+\"\\'\"+ encrypted+\"\\'\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Deciphered 'Fubswdqdobvlv lq Dfwlrq Frxuvh, HF-Frxqflo' is 'Cryptanalysis in Action Course, EC-Council'\n"
+     ]
+    }
+   ],
+   "source": [
+    "decrypted = caesar_decipher(encrypted, shift)\n",
+    "print(\"Deciphered \"+\"\\'\"+  encrypted +\"\\'\"+  \" is \"+ \"\\'\"+ decrypted + \"\\'\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### General Substitution Cipher\n",
+    "<img src=\"./9.Images/GSC.jpg\" alt=\"General Substitution Cipher\"><br>\n",
+    "Similar to Caesar Cipher, but we create a mixed alphabet and send the message with the matching letter for the plaintext letter.<br>\n",
+    "The possible keys are 26! ~ 2^88<br>\n",
+    "The general substitution cipher can bebroken using frequency analysis.<br>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['c', 'f', 'h', 'i', 'j', 'n', 'o', 'w', 'g', 'e', 'l', 'x', 'g', 'v', 'k', 'b', 'd', 'u', 'z', 'a', 't', 'y', 's', 'm', 'p', 'r']\n"
+     ]
+    }
+   ],
+   "source": [
+    "import random\n",
+    "\n",
+    "alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']\n",
+    "cipher_alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']\n",
+    "\n",
+    "n = len(alphabet)-1\n",
+    "for i in range(n):\n",
+    "    rand_i = random.randint(0,n-i)\n",
+    "    tmp = cipher_alphabet.pop(rand_i)\n",
+    "    cipher_alphabet.append(tmp)\n",
+    "print(cipher_alphabet)\n",
+    "lookup = dict(zip(alphabet,cipher_alphabet))\n",
+    "              \n",
+    "def general_sub_cipher_encrypt(message):\n",
+    "    encrypted_message = \"\"\n",
+    "    for char in message:\n",
+    "        if char.isalpha():\n",
+    "            if char.isupper():\n",
+    "                tmp = lookup[char.lower()]\n",
+    "                encrypted_char = tmp.upper()\n",
+    "                encrypted_message += encrypted_char\n",
+    "            else:\n",
+    "                encrypted_char = lookup[char]\n",
+    "                encrypted_message += encrypted_char\n",
+    "        else:\n",
+    "            encrypted_message += char\n",
+    "    return encrypted_message\n",
+    "\n",
+    "\n",
+    "def general_sub_cipher_decrypt(encrypted_message):\n",
+    "    decrypted_message = \"\"\n",
+    "    for char in encrypted_message:\n",
+    "        if char.isalpha():\n",
+    "            if char.isupper():\n",
+    "                tmp = char.lower()\n",
+    "                for key, value in lookup.items():\n",
+    "                    if tmp == value:\n",
+    "                        decrypted_message += key\n",
+    "            else:\n",
+    "                for key, value in lookup.items():\n",
+    "                    if char == value:\n",
+    "                        decrypted_message += key             \n",
+    "        else:\n",
+    "            decrypted_message += char\n",
+    "    return decrypted_message"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "General Substitution Cipher Encryption Example -->\n",
+      "Plaintext: Cryptanalysis in Action. Cryptography is fun.\n",
+      "Encryption result: Hupbacvcxpzgz gv Chagkv. Hupbakducbwp gz ntv.\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Get the user input for ciphertext\n",
+    "print(\"General Substitution Cipher Encryption Example -->\")\n",
+    "plaintext = input(\"Please input the plaintext: \")\n",
+    "print(\"Plaintext: \" + plaintext)\n",
+    "ciphertext = general_sub_cipher_encrypt(plaintext)\n",
+    "print(\"Encryption result: \" + ciphertext)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "General Substitution Cipher Decryption Example -->\n",
+      "Ciphertext: Hupbacvcxpzgz gv Chagkv. Hupbakducbwp gz ntv.\n",
+      "Decryption result: Cryptanalysis in Action. Cryptography is fun.\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Get the user input for paintext\n",
+    "print(\"General Substitution Cipher Decryption Example -->\")\n",
+    "ciphertext = input(\"Please input the ciphertext: \")\n",
+    "print(\"Ciphertext: \" + ciphertext)\n",
+    "ciphertext = general_sub_cipher_decrypt(ciphertext)\n",
+    "print(\"Decryption result: \" + plaintext)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Polyalphabetic Substitution Ciphers\n",
+    "With monoalphabetic ciphers, every time we saw a given input (with some key) it become a given output.<br>\n",
+    "We hid the original character, but we failed to hide the underlying language.<br>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Vigenère Cipher\n",
+    "Invented by Blaise de Vigenere c. 1550, considered unbreakable for 300 years, <br>\n",
+    "broken by Charles Babbage, and used by the South in the U.S. Civil War.<br>\n",
+    "<br>\n",
+    "We treat that top row as the Caesar cipher key and the leftmost column as the plaintext.<br> \n",
+    "Then, the middle stuff is the ciphertext.<br>\n",
+    "You can see how each column is just a shift of the alphabet, according to the key. An example follows in the next few slides.<br>\n",
+    "\n",
+    "<img src=\"./9.Images/VC.jpg\">\n",
+    "<br>\n",
+    "Key = ROPE<br>\n",
+    "<br>\n",
+    "M = ATTACK AT DAWN<br>\n",
+    "K = ROPERO PE ROPE<br>\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def vignere_ciher_encrypt(plaintext, key):\n",
+    "    ciphertext = \"\"\n",
+    "    key_index = 0\n",
+    "    for char in plaintext:\n",
+    "        if char.isalpha():\n",
+    "            key_char = key[key_index % len(key)]\n",
+    "            if char.isupper():\n",
+    "                base = ord('A')\n",
+    "            else:\n",
+    "                base = ord('a')\n",
+    "            encrypted_char = chr((ord(char) - base + ord(key_char) - base) % 26 + base)\n",
+    "            ciphertext += encrypted_char\n",
+    "            key_index += 1\n",
+    "        else:\n",
+    "            ciphertext += char\n",
+    "    return ciphertext\n",
+    "\n",
+    "\n",
+    "def vignere_ciher_decrypt(ciphertext, key):\n",
+    "    plaintext = \"\"\n",
+    "    key_index = 0\n",
+    "    for char in ciphertext:\n",
+    "        if char.isalpha():\n",
+    "            key_char = key[key_index % len(key)]\n",
+    "            if char.isupper():\n",
+    "                base = ord('A')\n",
+    "            else:\n",
+    "                base = ord('a')\n",
+    "            decrypted_char = chr((ord(char) - base - (ord(key_char) - base) + 26) % 26 + base)\n",
+    "            plaintext += decrypted_char\n",
+    "            key_index += 1\n",
+    "        else:\n",
+    "            plaintext += char\n",
+    "    return plaintext"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Vignere Cipher Encryption Example -->\n",
+      "Plaintext: This is a test for the Vignere Cipher. \n",
+      "Encryption result: Djkg cf c bpwv hcl gjm Mmipslr Kqalgt. \n"
+     ]
+    }
+   ],
+   "source": [
+    "# Get the user input for ciphertext\n",
+    "print(\"Vignere Cipher Encryption Example -->\")\n",
+    "plaintext = input(\"Please input the plaintext: \")\n",
+    "key = input(\"Please input the key: \")\n",
+    "print(\"Plaintext: \" + plaintext)\n",
+    "ciphertext = vignere_ciher_encrypt(plaintext, key)\n",
+    "print(\"Encryption result: \" + ciphertext)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Vignere Cipher Decryption Example -->\n",
+      "Ciphertext: Djkg cf c bpwv hcl gjm Mmipslr Kqalgt. \n",
+      "Decryption result: This is a test for the Vignere Cipher. \n"
+     ]
+    }
+   ],
+   "source": [
+    "# Get the user input for plaintext\n",
+    "print(\"Vignere Cipher Decryption Example -->\")\n",
+    "ciphertext = input(\"Please input the ciphertext: \")\n",
+    "key = input(\"Please input the key: \")\n",
+    "print(\"Ciphertext: \" + ciphertext)\n",
+    "plaintext = vignere_ciher_decrypt(ciphertext, key)\n",
+    "print(\"Decryption result: \" + plaintext)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### One-Time Pad\n",
+    "\n",
+    "What if we changed the rules for using the Vigenère cipher to the following:<br>\n",
+    "<ol>\n",
+    "<li>Have a key as long as the message (is non-repeating)</li>\n",
+    "<li>A randomly generated key</li>\n",
+    "</ol>\n",
+    "<em>How could this be broken? If the key was used on multiple messages, we could still analyze each 1st letter of every message to get a frequency distribution.<br>\n",
+    "We need about 20 messages or so to do it.</em><br>\n",
+    "\n",
+    "OTP becomes the known unbreakable encryption if:<br>\n",
+    "<ol>\n",
+    "<li>Have a key as long as the message (is non-repeating)</li>\n",
+    "<li>Use a randomly generated key</li>\n",
+    "<li>The key is never used on another plaintext</li>\n",
+    "</ol>\n",
+    "Because:<br>\n",
+    "<ol>\n",
+    "<li>The use of the key, there are no statistics to use for plaintext extraction</li>\n",
+    "<li>Brute force is too expensive and even if the resulting messages are all different you cannot tell which message is the genuine one.</li>\n",
+    "</ol>\n",
+    "Problems:<br>\n",
+    "<ol>\n",
+    "<li>Key distribution</li>\n",
+    "<li>The key must be as long as the message</li>\n",
+    "<li>Keys must be random.</li>\n",
+    "</ol>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Transposition/Permutation Ciphers\n",
+    "Until this point, we try to hide secrets using the substitution operation. Transposition is rearranging the characters in a reversible way to obtain plaintext later.<br>\n",
+    "Take a table and write the message in columns and read it off in rows.<br>\n",
+    "\n",
+    "M = ATTACKTODAY<br>\n",
+    "\n",
+    "<table>\n",
+    "<tr>\n",
+    "<td>A</td>\n",
+    "<td>A</td>\n",
+    "<td>T</td>\n",
+    "<td>A</td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>T</td>\n",
+    "<td>C</td>\n",
+    "<td>O</td>\n",
+    "<td>Y</td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>T</td>\n",
+    "<td>K</td>\n",
+    "<td>D</td>\n",
+    "<td> </td>\n",
+    "</tr>\n",
+    "</table>\n",
+    "\n",
+    "C = AATATCOYTKD<br>\n",
+    "\n",
+    "\n",
+    "<table>\n",
+    "<tr>\n",
+    "<td>K</td>\n",
+    "<td></td>\n",
+    "<td></td>\n",
+    "<td></td>\n",
+    "<td></td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>3</td>\n",
+    "<td>A</td>\n",
+    "<td>A</td>\n",
+    "<td>T</td>\n",
+    "<td>A</td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>1</td>\n",
+    "<td>T</td>\n",
+    "<td>C</td>\n",
+    "<td>O</td>\n",
+    "<td>Y</td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>2</td>\n",
+    "<td>T</td>\n",
+    "<td>K</td>\n",
+    "<td>D</td>\n",
+    "<td> </td>\n",
+    "</tr>\n",
+    "</table>\n",
+    "\n",
+    "C = TCOYTKDAATA\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Modern Block Ciphers"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### DES 3DES AES"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: pycryptodome in c:\\users\\emrec\\anaconda3\\lib\\site-packages (3.18.0)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n",
+      "Requirement already satisfied: pycryptodome-test-vectors in c:\\users\\emrec\\anaconda3\\lib\\site-packages (1.0.13)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n",
+      "Requirement already satisfied: pycryptodomex in c:\\users\\emrec\\anaconda3\\lib\\site-packages (3.18.0)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n"
+     ]
+    }
+   ],
+   "source": [
+    "%pip install pycryptodome\n",
+    "# to testing with python -m Crypto.SelfTest\n",
+    "%pip install pycryptodome-test-vectors\n",
+    "# If PyCrypto is installed (it is the case for Anaconda)\n",
+    "%pip install pycryptodomex"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "b'\\xf3w\\x1a\\xf5\\xb4\\xc85\\xcf\\x0f\\xb9\\xcc\\x08\\xe7M=O\\x7f\\x89E;\\xd6`\\xe8\\x18'\n",
+      "b'Cryptography is the best'\n"
+     ]
+    }
+   ],
+   "source": [
+    "# DES Example\n",
+    "\n",
+    "from Cryptodome.Cipher import DES\n",
+    "\n",
+    "def pad(text):\n",
+    "    n = len(text) % 8\n",
+    "    return text + (b' ' * n)\n",
+    "\n",
+    "\n",
+    "key = b'hello123'\n",
+    "text1 = b'Cryptography is the best'\n",
+    "\n",
+    "des = DES.new(key, DES.MODE_ECB)\n",
+    "\n",
+    "padded_text = pad(text1)\n",
+    "encrypted_text = des.encrypt(padded_text)\n",
+    "\n",
+    "print(encrypted_text)\n",
+    "print(des.decrypt(encrypted_text))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: pyaes in c:\\users\\emrec\\anaconda3\\lib\\site-packages (1.6.1)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n",
+      "Requirement already satisfied: pbkdf2 in c:\\users\\emrec\\anaconda3\\lib\\site-packages (1.3)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n",
+      "AES encryption key: b'5dd2f9dbb70a533d81c4ce5e8ff248e7aabc4d1daf7687d3c543e91a8253735e'\n"
+     ]
+    }
+   ],
+   "source": [
+    "%pip install pyaes\n",
+    "%pip install pbkdf2\n",
+    "\n",
+    "import pyaes, pbkdf2, binascii, os, secrets\n",
+    "\n",
+    "# Derive a 256-bit AES encryption key from the password\n",
+    "password = \"s3cr3t*c0d3\"\n",
+    "passwordSalt = os.urandom(16)\n",
+    "key = pbkdf2.PBKDF2(password, passwordSalt).read(32)\n",
+    "print('AES encryption key:', binascii.hexlify(key))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Encrypted: b'a70210cbdf31e1c9b4bfefbd0137f96eaf9e6f'\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Encrypt the plaintext with the given key:\n",
+    "#   ciphertext = AES-256-CTR-Encrypt(plaintext, key, iv)\n",
+    "iv = secrets.randbits(256)\n",
+    "plaintext = \"Text for encryption\"\n",
+    "aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))\n",
+    "ciphertext = aes.encrypt(plaintext)\n",
+    "print('Encrypted:', binascii.hexlify(ciphertext))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Decrypted: b'Text for encryption'\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Decrypt the ciphertext with the given key:\n",
+    "#   plaintext = AES-256-CTR-Decrypt(ciphertext, key, iv)\n",
+    "aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))\n",
+    "decrypted = aes.decrypt(ciphertext)\n",
+    "print('Decrypted:', decrypted)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Wrongly decrypted: b\"\\x93\\xca\\x08\\xb1\\xfe)\\xaf\\xd1\\xcf\\x8f=\\xe1s'\\xa0O\\xd9\\xf6r\"\n"
+     ]
+    }
+   ],
+   "source": [
+    "key = os.urandom(32)   # random decryption key\n",
+    "aes = pyaes.AESModeOfOperationCTR(key, pyaes.Counter(iv))\n",
+    "print('Wrongly decrypted:', aes.decrypt(ciphertext))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Encryption key: b'7162c72733fcc3f1c661118778afc264b3087fc23685598cb25bd1be8608c6fc'\n",
+      "encryptedMsg {'ciphertext': b'3d7fac19f62837a1e3a78537c07875bf35b41969068b9ce34ae25e42f3711642b05d8c59a2bf2400ed554e', 'aesIV': b'303fc45a81e45f789310fe17a0f54d50', 'authTag': b'9d9f5c90ead41f4bd1da39be34f03e84'}\n",
+      "decryptedMsg b'Message for AES-256-GCM + Scrypt encryption'\n"
+     ]
+    }
+   ],
+   "source": [
+    "from Cryptodome.Cipher import AES\n",
+    "import binascii, os\n",
+    "\n",
+    "def encrypt_AES_GCM(msg, secretKey):\n",
+    "    aesCipher = AES.new(secretKey, AES.MODE_GCM)\n",
+    "    ciphertext, authTag = aesCipher.encrypt_and_digest(msg)\n",
+    "    return (ciphertext, aesCipher.nonce, authTag)\n",
+    "\n",
+    "def decrypt_AES_GCM(encryptedMsg, secretKey):\n",
+    "    (ciphertext, nonce, authTag) = encryptedMsg\n",
+    "    aesCipher = AES.new(secretKey, AES.MODE_GCM, nonce)\n",
+    "    plaintext = aesCipher.decrypt_and_verify(ciphertext, authTag)\n",
+    "    return plaintext\n",
+    "\n",
+    "secretKey = os.urandom(32)  # 256-bit random encryption key\n",
+    "print(\"Encryption key:\", binascii.hexlify(secretKey))\n",
+    "\n",
+    "msg = b'Message for AES-256-GCM + Scrypt encryption'\n",
+    "encryptedMsg = encrypt_AES_GCM(msg, secretKey)\n",
+    "print(\"encryptedMsg\", {\n",
+    "    'ciphertext': binascii.hexlify(encryptedMsg[0]),\n",
+    "    'aesIV': binascii.hexlify(encryptedMsg[1]),\n",
+    "    'authTag': binascii.hexlify(encryptedMsg[2])\n",
+    "})\n",
+    "\n",
+    "decryptedMsg = decrypt_AES_GCM(encryptedMsg, secretKey)\n",
+    "print(\"decryptedMsg\", decryptedMsg)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### PKCS #5 Padding\n",
+    "Hexadecimal padding of a 64-bit block<br>\n",
+    "1 byte:   01<br>\n",
+    "2 bytes:  0202<br>\n",
+    "3 bytes:  030303, up to<br>\n",
+    "8 bytes:  0808080808080808<br>\n",
+    "Always adds padding, so the last byte is guaranteed to be a pad byte<br>\n",
+    "This allows the padding to be removed unambiguously after decryption<br>\n",
+    "\n",
+    "<img src=\"./9.Images/Pad.jpg\">"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Modes in Symmetric Encryption\n",
+    "There are many modes of operation. <br>\n",
+    "We go over the details of them in our course content.<br>\n",
+    "Fundamentally using modes in encryption serves different purposes. One mode is more applicable to streaming data the other is more suitable for the data-at-rest.\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## CONCLUSION\n",
+    "We concluded our explanation about the symmetric cryptographic applications."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "base",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.4"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
